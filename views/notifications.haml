@@ -1,0 +1,9 @@
+- content_for :top do
+  != haml :_update_form
+
+!= haml :_navigation
+
+.notifications
+  - @notifications.each do |notification|
+    .notification{:class => notification.read ? "read" : "unread" }
+      != haml :"notifications/_#{notification._type.underscore}", :locals => {:notification =>  notification}

@@ -1,0 +1,10 @@
+
+
+%a{ :href =>"/users/#{notification.target.username}"  }
+  &= notification.target.username
+is now listening to your updates
+
+- if !current_user.following? notification.target.feed.url
+  %form{:method => "post", :action => "/subscriptions"}
+    %input{:type => "hidden", :name => "url", :value => "/feeds/#{notification.target.feed.id}"}
+      %input.button.follow{:type => "submit", :value => "Follow Back", :id => "follow-#{notification.target.feed.id}"}
