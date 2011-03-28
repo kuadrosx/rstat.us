@@ -22,6 +22,14 @@ class Update
   before_create :get_tags
   before_create :get_language
 
+  key :mentioned_ids, Array
+  has_many :mentioned, :in => :mentioned_ids, :class_name => "Author"
+
+  key :mentioned_feed_ids, Array
+  has_many :mentioned_feeds, :in => :mentioned_feed_ids, :class_name => "Feed"
+
+  before_create :search_mentions
+
   key :remote_url
   key :referral_id
 
@@ -70,6 +78,14 @@ class Update
 
   def get_language
     self[:language] = self.text.language
+  end
+
+  def search_mentions
+    nicks = text.scan(/@(\w*)/).flatten
+    Author.all(:username.in => nicks, :fields => ['_id']).each do |author|
+      self[:mentioned_ids] << author.id
+      self[:mentioned_feed_ids] << author.feed.id
+    end
   end
 
   protected
