@@ -4,6 +4,13 @@
 != haml :_navigation
 
 .notifications
+  %form{:id => "readall_form", :action =>'/readall', :method => "POST"}
+    %input#readall-button.button{:type => "submit", :value => "Mark all as Read"}
+
   - @notifications.each do |notification|
     .notification{:class => notification.read ? "read" : "unread" }
       != haml :"notifications/_#{notification._type.underscore}", :locals => {:notification =>  notification}
+
+      .entry-info
+        %time.published{:datetime => notification.created_at.iso8601}
+        = notification.created_at.ago_in_words

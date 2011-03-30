@@ -1,0 +1,2 @@
+class MentionedNotification < Notification
+end

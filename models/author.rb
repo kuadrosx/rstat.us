@@ -24,6 +24,8 @@ class Author
   one :feed
   one :user
 
+  many :notifications, :dependant => :destroy
+
   # The url of their profile page
   key :remote_url, String
 

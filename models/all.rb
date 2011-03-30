@@ -8,4 +8,5 @@ require_relative 'notifier'
 require_relative 'feed'
 require_relative 'notification'
 require_relative 'followed_notification'
+require_relative 'mentioned_notification'
 

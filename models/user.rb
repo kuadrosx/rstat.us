@@ -83,6 +83,9 @@ class User
   # Get an authorization by providing the assoaciated provider
   def get_authorization(auth)
     Authorization.first(:provider => auth.to_s, :user_id => self.id)
+    notification = FollowedNotification.new(:author_id => f.author_id)
+    notification.target = self
+    notification.save
   end
 
   key :following_ids, Array

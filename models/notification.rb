@@ -1,11 +1,11 @@
 class Notification
-  require 'cgi'
   include MongoMapper::Document
+  timestamps!
 
   key :_type, String
 
-  key :user_id, BSON::ObjectId
-  belongs_to :user
+  key :author_id, BSON::ObjectId
+  belongs_to :author
 
   key :target_id, String
   key :target_type, String

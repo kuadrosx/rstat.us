@@ -1,0 +1,6 @@
+%a{:href =>"/users/#{notification.target.author.username}"  }
+  &= notification.target.author.username
+
+mentioned you on
+%a{:href=>"/updates/#{notification.target_id}"}
+  &= notification.target.text

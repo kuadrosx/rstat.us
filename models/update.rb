@@ -29,6 +29,7 @@ class Update
   has_many :mentioned_feeds, :in => :mentioned_feed_ids, :class_name => "Feed"
 
   before_create :search_mentions
+  fter_create :create_mention_notifications
 
   key :remote_url
   key :referral_id
@@ -78,14 +79,6 @@ class Update
 
   def get_language
     self[:language] = self.text.language
-  end
-
-  def search_mentions
-    nicks = text.scan(/@(\w*)/).flatten
-    Author.all(:username.in => nicks, :fields => ['_id']).each do |author|
-      self[:mentioned_ids] << author.id
-      self[:mentioned_feed_ids] << author.feed.id
-    end
   end
 
   protected
@@ -149,6 +142,22 @@ class Update
       end
     end
 
+  end
+
+  def search_mentions
+    nicks = text.scan(/@(\w*)/).flatten
+    Author.all(:username.in => nicks, :fields => ['_id']).each do |author|
+      self[:mentioned_ids] << author.id
+      self[:mentioned_feed_ids] << author.feed.id
+    end
+
+    def create_mention_notifications
+      self.mentioned.each do |author|
+        notification = MentionedNotification.new(:author => author)
+        notification.target = self
+        notification.save
+      end
+    end
   end
 
   def do_not_repeat_yourself
