@@ -113,4 +113,20 @@ describe User do
       assert u.hashed_password != prev_pass
     end
   end
+
+  describe "following" do
+    it "should create an notification for the followed user" do
+      at = Factory(:author)
+      f = Factory(:feed, :author =>at)
+      u = Factory(:user, :username => "someone", :feed => f, :author => at)
+      at1 = Factory(:author)
+      f1 = Factory(:feed, :author =>at1)
+      u1 = Factory(:user, :username => "somebody", :feed => f1, :author => at1)
+
+      n = FollowedNotification.new(:author => at)
+      FollowedNotification.expects(:new).with(:author => at).returns(n)
+      u1.follow! f.url
+      assert_equal at.notifications.count, 1
+    end
+  end
 end

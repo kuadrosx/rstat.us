@@ -29,7 +29,7 @@ class Update
   has_many :mentioned_feeds, :in => :mentioned_feed_ids, :class_name => "Feed"
 
   before_create :search_mentions
-  fter_create :create_mention_notifications
+  after_create :create_mention_notifications
 
   key :remote_url
   key :referral_id

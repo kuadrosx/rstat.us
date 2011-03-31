@@ -39,7 +39,7 @@ describe Update do
       before do
         Factory(:user, :username => "steveklabnik")
       end
-      
+
       it "makes a link (before create)" do
         u = Update.new(:text => "This is a message mentioning @SteveKlabnik.")
         assert_match /<a href='\/users\/steveklabnik'>@SteveKlabnik<\/a>/, u.to_html
@@ -50,13 +50,13 @@ describe Update do
         assert_match /<a href='\/users\/steveklabnik'>@SteveKlabnik<\/a>/, u.html
       end
     end
-    
+
     describe "existing user mentioned in the middle of the word" do
       before do
         Factory(:user, :username => "steveklabnik")
         Factory(:user, :username => "bar")
       end
-      
+
       it "does not make a link (before create)" do
         u = Update.new(:text => "@SteveKlabnik @nobody foo@bar.wadus @SteveKlabnik")
         assert_match "<a href='\/users\/steveklabnik'>@SteveKlabnik<\/a> @nobody foo@bar.wadus <a href='\/users\/steveklabnik'>@SteveKlabnik<\/a>", u.to_html
@@ -114,7 +114,7 @@ describe Update do
       assert_match /<a href='\/hashtags\/hashtag'>#hashtag<\/a>/, u.html
       assert_match /<a href='http:\/\/rstat.us\/'>http:\/\/rstat.us\/<\/a>/, u.html
     end
-    
+
     it "extracts hashtags" do
       u = Update.create(:text => "#lots #of #hash #tags")
       assert_equal ["lots", "of", "hash", "tags"], u.tags
@@ -128,7 +128,7 @@ describe Update do
       end
       assert_equal search_results.sort(), [u1.id.to_s, u2.id.to_s].sort()
     end
-    
+
     it "can filter by hashtag" do
       update = Update.create(:text => "mother-effing #hashtags")
       Update.create(:text => "just some other update")
@@ -205,7 +205,7 @@ describe Update do
         u.feed.updates << Update.new(:text => "This is a message", :facebook => true, :twitter => false, :author => at)
       end
     end
-    
+
     describe "facebook => false" do
       it "does not send the update to facebook" do
         f = Factory(:feed)
@@ -232,7 +232,7 @@ describe Update do
       user.feed.updates << update
       refute update.valid?, "You already posted this update"
     end
-    
+
     it "will save if each are from different users" do
       feed1 = Factory(:feed)
       author1 = Factory(:author, :feed => feed1)
@@ -248,6 +248,28 @@ describe Update do
       update = Update.new(:text => "This is a message", :author => author2, :twitter => false, :facebook => false)
       user1.feed.updates << update
       assert update.valid?
+    end
+  end
+
+  describe "search mentions" do
+    it "will found an user mentioned on the on update" do
+      f = Factory(:feed)
+      at = Factory(:author, :feed => f)
+      u = Factory(:user, :author => at, :feed => f)
+      a = Factory(:authorization, :user => u)
+      update = Update.create(:text => "This has a mention to @#{at.username}", :author => at)
+      assert_equal update.mentioned.first, at
+    end
+
+    it "will create an notification for the mentioned user " do
+      f = Factory(:feed)
+      at = Factory(:author, :feed => f)
+      u = Factory(:user, :author => at, :feed => f)
+      a = Factory(:authorization, :user => u)
+      n = MentionedNotification.new(:author => at)
+      MentionedNotification.expects(:new).with(:author => at).returns(n)
+      update = Update.create(:text => "This has a mention to @#{at.username}", :author => at)
+      assert_equal at.notifications.count, 1
     end
   end
 end

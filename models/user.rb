@@ -7,8 +7,7 @@ class User
   require 'digest/md5'
 
   include MongoMapper::Document
-  many :authorizations, :dependant => :destroy
-  many :notifications, :dependant => :destroy
+  many :authorizations, :dependent => :destroy
 
   key :username, String, :required => true
   key :perishable_token, String
@@ -20,10 +19,6 @@ class User
 
   # Twitter has 15, let's be different
   validates_length_of :username, :maximum => 17, :message => "must be 17 characters or fewer."
-
-  # eff you mongo_mapper.
-  validates_uniqueness_of :email, :allow_nil => :true
-  validates_uniqueness_of :username, :allow_nil => :true
 
   # validate users don't have @ in their usernames
   validate :no_special_chars
@@ -83,7 +78,7 @@ class User
   # Get an authorization by providing the assoaciated provider
   def get_authorization(auth)
     Authorization.first(:provider => auth.to_s, :user_id => self.id)
-    notification = FollowedNotification.new(:author_id => f.author_id)
+    notification = FollowedNotification.new(:author => f.author)
     notification.target = self
     notification.save
   end
@@ -136,6 +131,7 @@ class User
       return if followee.nil?
       followee.followers_ids.delete(self.feed.id)
       followee.save
+      FollowedNotification.new(:user => followee, :target => self).save
     end
   end
 
