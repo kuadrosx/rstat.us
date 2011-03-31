@@ -1,6 +1,7 @@
-%a{:href =>"/users/#{notification.target.author.username}"  }
-  &= notification.target.author.username
+you have been mentioned on a
 
-mentioned you on
-%a{:href=>"/updates/#{notification.target_id}"}
-  &= notification.target.text
+%a{:href =>"/users/#{notification.target.author.username}", :title => notification.target.author.name }
+  == #{notification.target.author.username}'s
+
+%a{:href=>"/updates/#{notification.target_id}", :title => notification.target.text}
+  status
