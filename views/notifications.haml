@@ -1,16 +1,20 @@
+- title "Notifications"
+
 - content_for :top do
-  != haml :_update_form
-
-!= haml :_navigation
-
-.notifications
   %form{:id => "readall_form", :action =>'/readall', :method => "POST"}
     %input#readall-button.button{:type => "submit", :value => "Mark all as Read"}
 
-  - @notifications.each do |notification|
-    .notification{:class => notification.read ? "read" : "unread" }
-      != haml :"notifications/_#{notification._type.underscore}", :locals => {:notification =>  notification}
+-# Generate page id from url
+%ul.notifications
+  = @notifications.count
+  -@notifications.each do |notification|
+    != haml :"notifications/_notification", :locals => {:notification =>  notification}
 
-      .entry-info
-        %time.published{:datetime => notification.created_at.iso8601}
-        = notification.created_at.ago_in_words
+%nav.pagination
+  - unless @prev_page.nil?
+    %a.button{:href => @prev_page, :id => "prev_button"}
+      &laquo; Previous
+
+  - unless @next_page.nil?
+    %a.button{:href => @next_page, :id => "next_button"}
+      Next &raquo;

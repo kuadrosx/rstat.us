@@ -116,7 +116,7 @@ class User
       followee = User.first(:author_id => f.author.id)
       followee.followers << self.feed
       followee.save
-      FollowedNotification.new(:user => followee, :target => self).save
+      FollowedNotification.new(:author_id => f.author.id, :target => self.author).save
     end
 
     f
@@ -131,7 +131,6 @@ class User
       return if followee.nil?
       followee.followers_ids.delete(self.feed.id)
       followee.save
-      FollowedNotification.new(:user => followee, :target => self).save
     end
   end
 
